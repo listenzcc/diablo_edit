@@ -18,6 +18,8 @@
 #include "DlgSelectChar.h"
 #include "DlgCharItems.h"
 
+#include <shlobj.h> // 对于 SHGetFolderPath
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -199,9 +201,30 @@ void CDiabloEdit2View::OnFileNew()
 	}
 }
 
+CString GetUserProfilePath()
+{
+	TCHAR path[MAX_PATH];
+
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, path)))
+	{
+		return CString(path) + _T("\\Saved Games\\Diablo II Resurrected");
+	}
+	else
+	{
+		AfxMessageBox(_T("无法获取用户目录"));
+		return _T("C:\\");
+	}
+}
+
 void CDiabloEdit2View::OnFileOpen()
 {
 	CFileDialog open(TRUE,_T("d2s"),0,OFN_HIDEREADONLY | OFN_FILEMUSTEXIST,_T("Diablo II Character(*.d2s)|*.d2s|All File(*.*)|*.*||"));
+
+	// 设置初始目录
+	// open.m_ofn.lpstrInitialDir = _T("C://");
+	open.m_ofn.lpstrInitialDir = GetUserProfilePath();
+
+
 	if(open.DoModal() == IDOK){
 		if(m_sPathName.GetLength()){
 			int mb = MessageBox(CSFormat(::theApp.MsgBoxInfo(8), m_sTitle), ::theApp.MsgWarning(), MB_YESNOCANCEL | MB_ICONWARNING);
