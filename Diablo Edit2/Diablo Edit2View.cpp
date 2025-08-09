@@ -20,6 +20,12 @@
 
 #include <shlobj.h> // 对于 SHGetFolderPath
 
+#include <iostream>
+#include <filesystem>
+#include <vector>
+
+namespace fs = std::filesystem;
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -100,6 +106,37 @@ CDiabloEdit2Doc* CDiabloEdit2View::GetDocument() const // 非调试版本是内�
 }
 #endif //_DEBUG
 
+// Utils
+CString GetUserProfilePath()
+{
+	TCHAR path[MAX_PATH];
+
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, path)))
+	{
+		return CString(path) + _T("\\Saved Games\\Diablo II Resurrected");
+	}
+	else
+	{
+		AfxMessageBox(_T("无法获取用户目录"));
+		return _T("C:\\");
+	}
+}
+
+std::vector<fs::path> FindD2SFiles(const CString& directory) {
+	std::vector<fs::path> d2sFiles;
+
+	// 将 CString 转换为 std::wstring
+	std::wstring dirPath = directory.GetString();
+
+	// 遍历目录及其子目录
+	for (const auto& entry : fs::recursive_directory_iterator(dirPath)) {
+		if (entry.is_regular_file() && entry.path().extension() == L".d2s") {
+			d2sFiles.push_back(entry.path());
+		}
+	}
+
+	return d2sFiles;
+}
 
 // CDiabloEdit2View 消息处理程序
 
@@ -141,6 +178,23 @@ void CDiabloEdit2View::InitUI(void)
 		// resize views
 		ResizeParentToFit();
 		RefreshUI();
+
+		auto profilePath = GetUserProfilePath();
+		auto files = FindD2SFiles(profilePath);
+		for (const auto& file : files) {
+			CString filePath = CString(file.wstring().c_str());
+			// std::wcout << L"Processing file: " << file << std::endl;
+
+			// 在这里对 file 进行操作（例如读取内容、解析数据等）
+			// Example: 
+			// if (ReadD2SFile(file)) { ... }
+			if (ReadD2sFile(filePath)) {
+				for (int i = 0; i < m_nTabPageCount; ++i)
+					m_dlgTabPage[i]->UpdateUI(m_Character);
+			}
+		}
+		// AfxMessageBox(_T("Hello Diablo II\n") + profilePath);
+
 	}
 }
 
@@ -201,20 +255,7 @@ void CDiabloEdit2View::OnFileNew()
 	}
 }
 
-CString GetUserProfilePath()
-{
-	TCHAR path[MAX_PATH];
 
-	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, path)))
-	{
-		return CString(path) + _T("\\Saved Games\\Diablo II Resurrected");
-	}
-	else
-	{
-		AfxMessageBox(_T("无法获取用户目录"));
-		return _T("C:\\");
-	}
-}
 
 void CDiabloEdit2View::OnFileOpen()
 {
