@@ -23,6 +23,12 @@
 #include <iostream>
 #include <filesystem>
 #include <vector>
+#include <fstream> // For file operations
+#include <ctime>
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+
 
 namespace fs = std::filesystem;
 
@@ -179,10 +185,39 @@ void CDiabloEdit2View::InitUI(void)
 		ResizeParentToFit();
 		RefreshUI();
 
+		// 获取当前时间点
+		auto now = std::chrono::system_clock::now();
+		std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+		// 跨平台安全转换
+		std::tm tm_struct;
+#if defined(_WIN32)
+		localtime_s(&tm_struct, &now_time); // Windows
+#else
+		localtime_r(&now_time, &tm_struct); // Linux/macOS
+#endif
+
 		auto profilePath = GetUserProfilePath();
 		auto files = FindD2SFiles(profilePath);
+
+		// Open the file in override mode to store the character's items
+		// It refreshes the file.
+		std::ofstream outFile("character_items.txt", std::ios::out);
+		// Write UTF-8 BOM (0xEF, 0xBB, 0xBF) for UTF-8 encoding
+		// unsigned char bom[] = { 0xEF, 0xBB, 0xBF };
+		// outFile.write(reinterpret_cast<char*>(bom), 3);
+		char* p = ConvertCStringToBytes(profilePath.GetString());
+		outFile << "@ File: character_items.txt\n";
+		outFile << "@ Author: listenzcc@gmail.com\n";
+		outFile << "@ Profile Path: " << p << "\n";
+		outFile << "@ Characters: " << files.size() << "\n";
+		outFile << "@ Time: " << std::put_time(&tm_struct, "%Y-%m-%d %H:%M:%S") << "\n";
+		outFile << "------------------------------\n";
+		delete[] p;
+		outFile.close();
+
 		for (const auto& file : files) {
 			CString filePath = CString(file.wstring().c_str());
+			CString fileName = CString(file.filename().c_str());
 			// std::wcout << L"Processing file: " << file << std::endl;
 
 			// 在这里对 file 进行操作（例如读取内容、解析数据等）
@@ -191,8 +226,11 @@ void CDiabloEdit2View::InitUI(void)
 			if (ReadD2sFile(filePath)) {
 				for (int i = 0; i < m_nTabPageCount; ++i)
 					m_dlgTabPage[i]->UpdateUI(m_Character);
+
+				GetDocument()->SetTitle(fileName);
 			}
 		}
+
 		// AfxMessageBox(_T("Hello Diablo II\n") + profilePath);
 
 	}

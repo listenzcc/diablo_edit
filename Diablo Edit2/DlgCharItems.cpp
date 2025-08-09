@@ -532,6 +532,17 @@ BEGIN_MESSAGE_MAP(CDlgCharItems, CDialog)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_RECYCLE, &CDlgCharItems::OnNMDblclkListRecycle)
 END_MESSAGE_MAP()
 
+char* ConvertCStringToBytes(LPCWSTR cst) {
+	// Convert wide strings (UTF-16) to UTF-8 using Windows API
+	int len = WideCharToMultiByte(CP_UTF8, 0, cst, -1, nullptr, 0, nullptr, nullptr);
+
+	char* utf8Str = new char[len];
+
+	WideCharToMultiByte(CP_UTF8, 0, cst, -1, utf8Str, len, nullptr, nullptr);
+
+	return utf8Str;
+}
+
 void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 	ResetAll();
 	m_bHasCharacter = TRUE;
@@ -542,29 +553,27 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 	//Character items
 
 	// Open the file in append mode to store the character's items
-	std::ofstream outFile("character_items.txt", std::ios::out | std::ios::app);
+	std::ofstream outFile("character_items.txt", std::ios::out | std::ios::app );
+
 	// Write UTF-8 BOM (0xEF, 0xBB, 0xBF) for UTF-8 encoding
-	unsigned char bom[] = { 0xEF, 0xBB, 0xBF };
-	outFile.write(reinterpret_cast<char*>(bom), 3);
+	// unsigned char bom[] = { 0xEF, 0xBB, 0xBF };
+	// outFile.write(reinterpret_cast<char*>(bom), 3);
 
 	for (auto & item : character.ItemList.vItems) {
 		AddItemInGrid(item, 0);
-		ATL::CSimpleStringT<wchar_t, 1> itemName = item.ItemName();
+
 		ATL::CSimpleStringT<wchar_t, 1> playerName = character.name();
+		ATL::CSimpleStringT<wchar_t, 1> itemName = item.ItemName();
+		int quality = item.Quality();
+		if (item.IsRuneWord()) quality += 10;
 
-		// Convert wide strings (UTF-16) to UTF-8 using Windows API
-		int utf8ItemNameLen = WideCharToMultiByte(CP_UTF8, 0, itemName.GetString(), -1, nullptr, 0, nullptr, nullptr);
-		int utf8PlayerNameLen = WideCharToMultiByte(CP_UTF8, 0, playerName.GetString(), -1, nullptr, 0, nullptr, nullptr);
-
-		char* utf8ItemName = new char[utf8ItemNameLen];
-		char* utf8PlayerName = new char[utf8PlayerNameLen];
-
-		WideCharToMultiByte(CP_UTF8, 0, itemName.GetString(), -1, utf8ItemName, utf8ItemNameLen, nullptr, nullptr);
-		WideCharToMultiByte(CP_UTF8, 0, playerName.GetString(), -1, utf8PlayerName, utf8PlayerNameLen, nullptr, nullptr);
+		char* utf8PlayerName = ConvertCStringToBytes(playerName.GetString());
+		char* utf8ItemName = ConvertCStringToBytes(itemName.GetString()); // new char[utf8ItemNameLen];
 
 		// Write the item and player names in UTF-8 to the file
-		outFile << "Item Name: " << utf8ItemName << "\n";
 		outFile << "Player Name: " << utf8PlayerName << "\n";
+		outFile << "Item Name: " << utf8ItemName << "\n";
+		outFile << "Quality: " << quality << "\n";
 		outFile << "------------------------------\n";
 
 		// Free the dynamically allocated memory

@@ -168,3 +168,14 @@ public:
 	afx_msg void OnNMClickListRecycle(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMDblclkListRecycle(NMHDR *pNMHDR, LRESULT *pResult);
 };
+
+/*
+Convert ATL::CSimpleStringT<wchar_t, 1> t to file writeable string.
+Usage:
+	std::ofstream outFile("character_items.txt", std::ios::out);
+	char* s = ConvertCStringToBytes(t.GetString());
+	outFile << s << "\n";
+	delete[] s;
+	outFile.close();
+*/
+char* ConvertCStringToBytes(LPCWSTR);
