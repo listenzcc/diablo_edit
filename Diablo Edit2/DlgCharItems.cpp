@@ -2,6 +2,10 @@
 //
 
 #include "stdafx.h"
+// Include necessary headers
+#include <afx.h>  // For CString
+#include <fstream> // For file operations
+#include <windows.h>  // For WideCharToMultiByte
 
 #include "Diablo Edit2.h"
 #include "DlgCharItems.h"
@@ -534,9 +538,52 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 	SetD2R(IsD2R(character.dwVersion));
 	m_dwWeaponSet = character.dwWeaponSet;
 	m_bSecondHand = m_dwWeaponSet != 0;
+
 	//Character items
-	for (auto & item : character.ItemList.vItems) 
+
+	// Open the file in append mode to store the character's items
+	std::ofstream outFile("character_items.txt", std::ios::out | std::ios::app);
+	// Write UTF-8 BOM (0xEF, 0xBB, 0xBF) for UTF-8 encoding
+	unsigned char bom[] = { 0xEF, 0xBB, 0xBF };
+	outFile.write(reinterpret_cast<char*>(bom), 3);
+
+	for (auto & item : character.ItemList.vItems) {
 		AddItemInGrid(item, 0);
+		ATL::CSimpleStringT<wchar_t, 1> itemName = item.ItemName();
+		ATL::CSimpleStringT<wchar_t, 1> playerName = character.name();
+
+		// Convert wide strings (UTF-16) to UTF-8 using Windows API
+		int utf8ItemNameLen = WideCharToMultiByte(CP_UTF8, 0, itemName.GetString(), -1, nullptr, 0, nullptr, nullptr);
+		int utf8PlayerNameLen = WideCharToMultiByte(CP_UTF8, 0, playerName.GetString(), -1, nullptr, 0, nullptr, nullptr);
+
+		char* utf8ItemName = new char[utf8ItemNameLen];
+		char* utf8PlayerName = new char[utf8PlayerNameLen];
+
+		WideCharToMultiByte(CP_UTF8, 0, itemName.GetString(), -1, utf8ItemName, utf8ItemNameLen, nullptr, nullptr);
+		WideCharToMultiByte(CP_UTF8, 0, playerName.GetString(), -1, utf8PlayerName, utf8PlayerNameLen, nullptr, nullptr);
+
+		// Write the item and player names in UTF-8 to the file
+		outFile << "Item Name: " << utf8ItemName << "\n";
+		outFile << "Player Name: " << utf8PlayerName << "\n";
+		outFile << "------------------------------\n";
+
+		// Free the dynamically allocated memory
+		delete[] utf8ItemName;
+		delete[] utf8PlayerName;
+
+		/*
+		// Write the item and player names to the file directly as wide characters
+		outFile << L"Item Name: " << itemName.GetString() << L"\n";
+		// outFile << L"Player Name: " << playerName.GetString() << L"\n";
+		outFile << L"Player Name: "<< playerName << L"\n";
+		outFile << L"------------------------------\n";
+		*/
+
+	}
+
+	// Close the file after writing
+	outFile.close();
+
 	//Corpse items
 	if (character.HasCorpse()) {
 		if (!m_bHasCorpse)
