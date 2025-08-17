@@ -1,6 +1,6 @@
 ﻿//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by DiabloEdit2.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 DiabloEdit2.rc 使用
 //
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
@@ -186,6 +186,7 @@
 #define IDD_DIALOG_NEW_ITEM             316
 #define IDD_DIALOG_NewItem              316
 #define IDB_BITMAP168                   317
+#define IDD_DIALOG_Summary              317
 #define IDB_BITMAP169                   318
 #define IDR_BINARY1                     318
 #define IDB_BITMAP170                   319
@@ -616,9 +617,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        479
+#define _APS_NEXT_RESOURCE_VALUE        481
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1062
+#define _APS_NEXT_CONTROL_VALUE         1064
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif
