@@ -203,6 +203,7 @@
     <ClInclude Include="DlgQuestInfo.h" />
     <ClInclude Include="DlgSelectChar.h" />
     <ClInclude Include="DlgSkills.h" />
+    <ClInclude Include="DlgSummary.h" />
     <ClInclude Include="DlgSuspend.h" />
     <ClInclude Include="DlgWayPoints.h" />
     <ClInclude Include="MetaData.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="DlgQuestInfo.cpp" />
     <ClCompile Include="DlgSelectChar.cpp" />
     <ClCompile Include="DlgSkills.cpp" />
+    <ClCompile Include="DlgSummary.cpp" />
     <ClCompile Include="DlgSuspend.cpp" />
     <ClCompile Include="DlgWayPoints.cpp" />
     <ClCompile Include="MainFrm.cpp" />

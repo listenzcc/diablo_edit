@@ -17,6 +17,7 @@
 //#include "DlgSkills.h"
 #include "DlgSelectChar.h"
 #include "DlgCharItems.h"
+#include "DlgSummary.h"
 
 #include <shlobj.h> // 对于 SHGetFolderPath
 
@@ -164,20 +165,32 @@ void CDiabloEdit2View::InitUI(void)
 {
 	if(!m_dlgTabPage){
 		m_tcTab.InsertItem(0,_T(""));
-		m_tcTab.InsertItem(1,_T(""));
+		m_tcTab.InsertItem(1, _T(""));
+		m_tcTab.InsertItem(2,_T(""));
 		//在此处添加新的属性页
 		m_nTabPageCount = m_tcTab.GetItemCount();
 
 		m_dlgTabPage = new CCharacterDialogBase*[m_nTabPageCount];
+
+		// Tab-1
 		m_dlgTabPage[0] = new CDlgCharBasicInfo;
 		m_dlgTabPage[0]->Create(CDlgCharBasicInfo::IDD, &m_tcTab);
+
+		// Tab-2
 		m_dlgTabPage[1] = new CDlgCharItems;
 		m_dlgTabPage[1]->Create(CDlgCharItems::IDD, &m_tcTab);
 		m_dlgTabPage[1]->ShowWindow(SW_HIDE);
+
+		// TODO: Tab-3
+		m_dlgTabPage[2] = new CDlgSummary;
+		m_dlgTabPage[2]->Create(CDlgSummary::IDD, &m_tcTab);
+		m_dlgTabPage[2]->ShowWindow(SW_HIDE);
+
 		//在此处添加新的属性窗体
 		m_nTabCurSel = 0;
 		m_tcTab.SetCurSel(m_nTabCurSel);
 		m_dlgTabPage[m_nTabCurSel]->ShowWindow(SW_SHOW);
+
 
 		LoadText();
 
@@ -360,6 +373,8 @@ void CDiabloEdit2View::LoadText()
     m_tcTab.SetItem(0,&tci);
     tci.pszText = (LPWSTR)::theApp.OtherUI(9).GetString();
     m_tcTab.SetItem(1,&tci);
+	tci.pszText = (LPWSTR)_T("Summary");
+	m_tcTab.SetItem(2, &tci);
 	//子窗口
 	for (int i = 0; i < m_nTabPageCount; ++i)
 		m_dlgTabPage[i]->LoadText();

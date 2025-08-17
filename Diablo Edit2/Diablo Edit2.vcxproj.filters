@@ -93,6 +93,9 @@
     <ClInclude Include="D2Version.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DlgSummary.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Diablo Edit2.cpp">
@@ -150,6 +153,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DlgNewItem.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgSummary.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
