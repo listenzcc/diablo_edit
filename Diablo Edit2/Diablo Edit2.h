@@ -21,6 +21,7 @@ struct CPropParam {
 	int iMax;
 };
 
+
 // CDiabloEdit2App:
 // 有关此类的实现，请参阅 Diablo Edit2.cpp
 //
@@ -127,6 +128,11 @@ public:
 		return m_vPropertyMetaData[index].findData(version);
 	}
 	const CD2S_Struct & NewCharacter() const { return m_stNewCharacter; }	//返回新建人物模板
+
+	std::vector<CString> g_allCharacterNames;
+	std::vector<CString> g_allItemNames;
+	BOOL dataIsFullyLoaded;
+
 private:
 	CString m_sAppPath;			//程序运行的目录
 	std::vector<std::vector<CString>> m_saLanguage;		//语言数据

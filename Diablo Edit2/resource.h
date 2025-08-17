@@ -465,8 +465,6 @@
 #define IDC_TREE1                       1060
 #define IDC_INV_STASH                   1061
 #define IDC_INV                         1062
-#define IDC_LISTBOX1                    1062
-#define IDC_DIALOG_Summary_CharListBox  1062
 #define IDC_INV_SOCKETS                 1063
 #define IDC_INV_CUBE                    1064
 #define IDC_INV_BELT_GRID               1065
@@ -621,7 +619,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        481
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1063
+#define _APS_NEXT_CONTROL_VALUE         1064
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

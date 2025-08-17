@@ -567,6 +567,13 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 		int quality = item.Quality();
 		if (item.IsRuneWord()) quality += 10;
 
+		CString concated = _T("");
+		//str.Format(_T("Value: %d, Pi: %.2f"), nValue, fValue);
+		concated.Format(_T("%-4d%s  %s"), quality, playerName, itemName);
+
+		::theApp.g_allItemNames.push_back(concated);
+
+
 		char* utf8PlayerName = ConvertCStringToBytes(playerName.GetString());
 		char* utf8ItemName = ConvertCStringToBytes(itemName.GetString()); // new char[utf8ItemNameLen];
 

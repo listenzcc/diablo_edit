@@ -6,6 +6,7 @@
 
 #include "afxcmn.h"
 #include "CharacterDialogBase.h"
+#include "Diablo Edit2Doc.h"
 
 class CDiabloEdit2View : public CFormView
 {
@@ -51,6 +52,7 @@ private:
 	CTabCtrl m_tcTab;
 	int	m_nTabCurSel,m_nTabPageCount;
 	CD2S_Struct	m_Character;
+
 // 自定义函数
 	void InitUI(void);
 	void RefreshUI(void);

@@ -89,6 +89,7 @@ CDiabloEdit2App::CDiabloEdit2App() noexcept
 	}
 
 	// 将所有重要的初始化放置在 InitInstance 中
+	dataIsFullyLoaded = FALSE;
 }
 
 // 唯一的 CDiabloEdit2App 对象

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "CharacterDialogBase.h"
-#include <afxwin.h>
+#include "afxwin.h"
+#include "afxcmn.h"
 #include "resource.h"
 
 class CDlgSummary : public CCharacterDialogBase
@@ -22,6 +23,10 @@ protected:
 // 自定义成员
 private:
 	int a;
+	// IDC_COMBOBOX1
+	CComboBox m_cbCharComboBox;
+	CComboBox m_cbItemComboBox;
+	CString m_s1;
 
 // 自定义函数
 public:
@@ -34,9 +39,6 @@ private:
 	void RefreshUI(void);
 public:
 	int b;
-	/*virtual BOOL OnInitDialog();
-	afx_msg void OnBnClicked_Skills();
-	afx_msg void OnEnChangeLevel();
+	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
-	afx_msg void OnTcnSelchangeTab1(NMHDR* pNMHDR, LRESULT* pResult);*/
 };

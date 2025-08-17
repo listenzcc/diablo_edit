@@ -231,6 +231,7 @@ void CDiabloEdit2View::InitUI(void)
 		for (const auto& file : files) {
 			CString filePath = CString(file.wstring().c_str());
 			CString fileName = CString(file.filename().c_str());
+			::theApp.g_allCharacterNames.push_back(fileName);
 			// std::wcout << L"Processing file: " << file << std::endl;
 
 			// 在这里对 file 进行操作（例如读取内容、解析数据等）
@@ -243,6 +244,9 @@ void CDiabloEdit2View::InitUI(void)
 				GetDocument()->SetTitle(fileName);
 			}
 		}
+
+		::theApp.dataIsFullyLoaded = TRUE;
+		m_dlgTabPage[2]->UpdateUI(m_Character);
 
 		// AfxMessageBox(_T("Hello Diablo II\n") + profilePath);
 
