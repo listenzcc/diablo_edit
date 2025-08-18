@@ -574,6 +574,39 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 		::theApp.g_allItemNames.push_back(concated);
 
 
+		if (quality == 4) {
+			::theApp.g_allItemNames_Magic.push_back(itemName);
+		}
+		else if (quality == 5)
+		{
+			::theApp.g_allItemNames_Set.push_back(itemName);
+		}
+		else if (quality == 6)
+		{
+			::theApp.g_allItemNames_Rare.push_back(itemName);
+		}
+		else if (quality == 7)
+		{
+			::theApp.g_allItemNames_Unique.push_back(itemName);
+		}
+		else if (quality == 8)
+		{
+			::theApp.g_allItemNames_Craft.push_back(itemName);
+		}
+		else if (quality > 8)
+		{
+			::theApp.g_allItemNames_RuneWord.push_back(itemName);
+		}
+		else {
+			// Filter out known unwanted items.
+			if (concated.ReverseFind(_T('Potion')) == -1
+				&& concated.ReverseFind(_T('Scroll')) == -1
+				&& concated.ReverseFind(_T('Key')) == -1
+				){
+				::theApp.g_allItemNames_Normal.push_back(itemName);
+			}
+		}
+
 		char* utf8PlayerName = ConvertCStringToBytes(playerName.GetString());
 		char* utf8ItemName = ConvertCStringToBytes(itemName.GetString()); // new char[utf8ItemNameLen];
 

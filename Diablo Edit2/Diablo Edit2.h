@@ -129,8 +129,16 @@ public:
 	}
 	const CD2S_Struct & NewCharacter() const { return m_stNewCharacter; }	//返回新建人物模板
 
+	// Global variables for tab3
 	std::vector<CString> g_allCharacterNames;
 	std::vector<CString> g_allItemNames;
+	std::vector<CString> g_allItemNames_Normal;
+	std::vector<CString> g_allItemNames_Magic;
+	std::vector<CString> g_allItemNames_Rare;
+	std::vector<CString> g_allItemNames_Set;
+	std::vector<CString> g_allItemNames_Unique;
+	std::vector<CString> g_allItemNames_RuneWord;
+	std::vector<CString> g_allItemNames_Craft;
 	BOOL dataIsFullyLoaded;
 
 private:

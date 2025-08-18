@@ -369,18 +369,28 @@
 #define IDC_CHECK_Corpse2               1005
 #define IDC_CHECK_Mercenary             1005
 #define IDC_STATIC_OWNER                1005
+#define IDC_COMBO5                      1005
+#define IDC_COMBO_White                 1005
+#define IDC_COMBO_Normal                1005
 #define IDC_CHECK1                      1006
 #define IDC_EDIT_OWNER                  1006
+#define IDC_COMBO_Magic                 1006
 #define IDC_CHECK2                      1007
 #define IDC_STATIC_CLASS                1007
+#define IDC_COMBO_Rare                  1007
 #define IDC_CHECK3                      1008
 #define IDC_STATIC_SOCKETS_EXT          1008
+#define IDC_COMBO_Set                   1008
 #define IDC_CHECK4                      1009
 #define IDC_COMBO_CLASS                 1009
+#define IDC_COMBO_Unique                1009
 #define IDC_CHECK5                      1010
 #define IDC_STATIC_MONSTER              1010
+#define IDC_COMBO_Craft                 1010
 #define IDC_CHECK6                      1011
 #define IDC_COMBO_MONSTER               1011
+#define IDC_COMBO_Craft2                1011
+#define IDC_COMBO_RuneWord              1011
 #define IDC_CHECK7                      1012
 #define IDC_COMBO_PARAM1                1012
 #define IDC_CHECK8                      1013
@@ -467,12 +477,20 @@
 #define IDC_INV                         1062
 #define IDC_INV_SOCKETS                 1063
 #define IDC_INV_CUBE                    1064
+#define IDC_STATIC_White                1064
+#define IDC_STATIC_Normal               1064
 #define IDC_INV_BELT_GRID               1065
+#define IDC_STATIC_Magic                1065
 #define IDC_INV_RH                      1066
+#define IDC_STATIC_Rare                 1066
 #define IDC_INV_LH                      1067
+#define IDC_STATIC_Set                  1067
 #define IDC_BUTTON1                     1068
+#define IDC_STATIC_Unique               1068
 #define IDC_INV_CORPSD_RH               1069
+#define IDC_STATIC_Craft                1069
 #define IDC_INV_CORPSD_LH               1070
+#define IDC_STATIC_RuneWord             1070
 #define IDC_INV_MERC_RH                 1071
 #define IDC_INV_MERC_LH                 1072
 #define IDC_LIST1                       1073
@@ -619,7 +637,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        481
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1064
+#define _APS_NEXT_CONTROL_VALUE         1066
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

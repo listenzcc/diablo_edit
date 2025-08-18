@@ -26,11 +26,20 @@ private:
 	// IDC_COMBOBOX1
 	CComboBox m_cbCharComboBox;
 	CComboBox m_cbItemComboBox;
+	CComboBox m_cbNormalItemComboBox;
+	CComboBox m_cbMagicItemComboBox;
+	CComboBox m_cbRareItemComboBox;
+	CComboBox m_cbSetItemComboBox;
+	CComboBox m_cbUniqueItemComboBox;
+	CComboBox m_cbRuneWordItemComboBox;
+	CComboBox m_cbCraftItemComboBox;
+
 	CString m_s1;
 
 // 自定义函数
 public:
 	void UpdateUI(const CD2S_Struct& character);
+	void UpdateItemsCombobox();
 	BOOL GatherData(CD2S_Struct& character);
 	void ResetAll();
 	void LoadText(void);	//加载控件的字符串内容

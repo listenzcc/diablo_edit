@@ -17,6 +17,14 @@ void CDlgSummary::DoDataExchange(CDataExchange* pDX)
     // TODO: Add DDX controls here
     DDX_Control(pDX, IDC_COMBO3, m_cbCharComboBox);
 	DDX_Control(pDX, IDC_COMBO4, m_cbItemComboBox);
+	DDX_Control(pDX, IDC_COMBO_Normal, m_cbNormalItemComboBox);
+	DDX_Control(pDX, IDC_COMBO_Magic, m_cbMagicItemComboBox);
+	DDX_Control(pDX, IDC_COMBO_Rare, m_cbRareItemComboBox);
+	DDX_Control(pDX, IDC_COMBO_Set, m_cbSetItemComboBox);
+	DDX_Control(pDX, IDC_COMBO_Unique, m_cbUniqueItemComboBox);
+	DDX_Control(pDX, IDC_COMBO_RuneWord, m_cbRuneWordItemComboBox);
+	DDX_Control(pDX, IDC_COMBO_Craft, m_cbCraftItemComboBox);
+
 	DDX_Text(pDX, IDC_STATIC, m_s1);
 }
 
@@ -37,7 +45,12 @@ CDlgSummary::~CDlgSummary()
 
 void CDlgSummary::UpdateUI(const CD2S_Struct& character)
 {
-	LoadText();
+	// Only update after data is fully loaded
+
+	if (::theApp.dataIsFullyLoaded) {
+		LoadText();
+		UpdateItemsCombobox();
+	}
 }
 
 BOOL CDlgSummary::GatherData(CD2S_Struct& character)
@@ -49,11 +62,29 @@ void CDlgSummary::ResetAll()
 {
 }
 
+static void UpdateItemCombobox(CComboBox& ccb, std::vector<CString>& vec) {
+	ccb.ResetContent();
+	for (const auto& info : vec) {
+		ccb.AddString(info);
+	}
+	if (ccb.GetCount() > 0) {
+		ccb.SetCurSel(0);
+	}
+}
+
+void CDlgSummary::UpdateItemsCombobox()
+{
+	UpdateItemCombobox(m_cbNormalItemComboBox, ::theApp.g_allItemNames_Normal);
+	UpdateItemCombobox(m_cbMagicItemComboBox, ::theApp.g_allItemNames_Magic);
+	UpdateItemCombobox(m_cbRareItemComboBox, ::theApp.g_allItemNames_Rare);
+	UpdateItemCombobox(m_cbSetItemComboBox, ::theApp.g_allItemNames_Set);
+	UpdateItemCombobox(m_cbUniqueItemComboBox, ::theApp.g_allItemNames_Unique);
+	UpdateItemCombobox(m_cbRuneWordItemComboBox, ::theApp.g_allItemNames_RuneWord);
+	UpdateItemCombobox(m_cbCraftItemComboBox, ::theApp.g_allItemNames_Craft);
+}
+
 void CDlgSummary::LoadText(void) {
 	m_s1.SetString((LPCTSTR)_T("This string is set to \"s1\""));
-
-	// Only update after data is fully loaded
-	if (::theApp.dataIsFullyLoaded) {
 
 	// Update only once
 	if (m_cbCharComboBox.GetCount() == 0) {
@@ -70,9 +101,6 @@ void CDlgSummary::LoadText(void) {
 			m_cbItemComboBox.AddString(info);
 		}
 	}
-	}
-
-
 
     UpdateData(FALSE);
 }
