@@ -543,6 +543,13 @@ char* ConvertCStringToBytes(LPCWSTR cst) {
 	return utf8Str;
 }
 
+static void InsertItemIntoHashMap(std::unordered_map<CString, std::vector<CD2Item>, CStringHash> & hashMap, const CString & itemName, const CD2Item & item) {
+	if (hashMap.find(itemName) == hashMap.end()) {
+		hashMap[itemName] = {};
+	}
+	hashMap[itemName].push_back(item);
+}
+
 void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 	ResetAll();
 	m_bHasCharacter = TRUE;
@@ -564,6 +571,7 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 
 		ATL::CSimpleStringT<wchar_t, 1> playerName = character.name();
 		ATL::CSimpleStringT<wchar_t, 1> itemName = item.ItemName();
+
 		int quality = item.Quality();
 		if (item.IsRuneWord()) quality += 10;
 
@@ -573,37 +581,36 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 
 		::theApp.g_allItemNames.push_back(concated);
 
-
 		if (quality == 4) {
-			::theApp.g_allItemNames_Magic.push_back(itemName);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Magic, itemName, item);
 		}
 		else if (quality == 5)
 		{
-			::theApp.g_allItemNames_Set.push_back(itemName);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Set, itemName, item);
 		}
 		else if (quality == 6)
 		{
-			::theApp.g_allItemNames_Rare.push_back(itemName);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Rare, itemName, item);
 		}
 		else if (quality == 7)
 		{
-			::theApp.g_allItemNames_Unique.push_back(itemName);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Unique, itemName, item);
 		}
 		else if (quality == 8)
 		{
-			::theApp.g_allItemNames_Craft.push_back(itemName);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Craft, itemName, item);
 		}
 		else if (quality > 8)
 		{
-			::theApp.g_allItemNames_RuneWord.push_back(itemName);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_RuneWord, itemName, item);
 		}
 		else {
 			// Filter out known unwanted items.
-			if (concated.ReverseFind(_T('Potion')) == -1
-				&& concated.ReverseFind(_T('Scroll')) == -1
-				&& concated.ReverseFind(_T('Key')) == -1
+			if (concated.ReverseFind(_T('Potion')) == -1 &&
+				concated.ReverseFind(_T('Scroll')) == -1 &&
+				concated.ReverseFind(_T('Key')) == -1
 				){
-				::theApp.g_allItemNames_Normal.push_back(itemName);
+				InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Normal, itemName, item);
 			}
 		}
 

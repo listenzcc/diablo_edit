@@ -34,6 +34,8 @@ private:
 	CComboBox m_cbRuneWordItemComboBox;
 	CComboBox m_cbCraftItemComboBox;
 
+	std::vector<CString> m_NormalItemKeys;
+
 	CString m_s1;
 
 // 自定义函数
@@ -50,4 +52,11 @@ public:
 	int b;
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
+	afx_msg void OnCbnSelchangeComboNormal();
+	afx_msg void OnCbnSelchangeComboMagic();
+	afx_msg void OnCbnSelchangeComboRare();
+	afx_msg void OnCbnSelchangeComboSet();
+	afx_msg void OnCbnSelchangeComboUnique();
+	afx_msg void OnCbnSelchangeComboRuneWord();
+	afx_msg void OnCbnSelchangeComboCraft();
 };

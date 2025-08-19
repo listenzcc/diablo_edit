@@ -21,6 +21,11 @@ struct CPropParam {
 	int iMax;
 };
 
+struct CStringHash {
+	size_t operator()(const CString& str) const {
+		return std::hash<std::wstring>()((LPCTSTR)str);
+	}
+};
 
 // CDiabloEdit2App:
 // 有关此类的实现，请参阅 Diablo Edit2.cpp
@@ -132,13 +137,16 @@ public:
 	// Global variables for tab3
 	std::vector<CString> g_allCharacterNames;
 	std::vector<CString> g_allItemNames;
-	std::vector<CString> g_allItemNames_Normal;
-	std::vector<CString> g_allItemNames_Magic;
-	std::vector<CString> g_allItemNames_Rare;
-	std::vector<CString> g_allItemNames_Set;
-	std::vector<CString> g_allItemNames_Unique;
-	std::vector<CString> g_allItemNames_RuneWord;
-	std::vector<CString> g_allItemNames_Craft;
+
+	// It requires a hash function (CStringHash) for CString
+	std::unordered_map<CString, std::vector<CD2Item>, CStringHash> g_hashMap_itemSelection_Normal,
+		g_hashMap_itemSelection_Magic,
+		g_hashMap_itemSelection_Rare,
+		g_hashMap_itemSelection_Set,
+		g_hashMap_itemSelection_Unique,
+		g_hashMap_itemSelection_RuneWord,
+		g_hashMap_itemSelection_Craft;
+
 	BOOL dataIsFullyLoaded;
 
 private:
