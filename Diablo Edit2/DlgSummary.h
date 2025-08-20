@@ -4,6 +4,7 @@
 #include "afxwin.h"
 #include "afxcmn.h"
 #include "resource.h"
+#include "Diablo Edit2.h"
 
 class CDlgSummary : public CCharacterDialogBase
 {
@@ -32,9 +33,16 @@ private:
 	CComboBox m_cbSetItemComboBox;
 	CComboBox m_cbUniqueItemComboBox;
 	CComboBox m_cbRuneWordItemComboBox;
-	CComboBox m_cbCraftItemComboBox;
+	CComboBox m_cbCraftItemComboBox,
+		m_cbSelectedItemComboBox;
 
-	std::vector<CString> m_NormalItemKeys;
+	std::vector<CString> m_NormalItemKeys,
+		m_MagicItemKeys,
+		m_RareItemKeys,
+		m_SetItemKeys,
+		m_UniqueItemKeys,
+		m_RuneWordItemKeys,
+		m_CraftItemKeys;
 
 	CString m_s1;
 
@@ -48,6 +56,7 @@ public:
 private:
 	void InitUI(void);
 	void RefreshUI(void);
+	void UpdateSelectedItemCombobox(std::vector<ItemWithCharacterName> & iwcn);
 public:
 	int b;
 	virtual BOOL OnInitDialog();

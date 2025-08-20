@@ -27,6 +27,11 @@ struct CStringHash {
 	}
 };
 
+struct ItemWithCharacterName {
+	CString characterName; //角色名字
+	CD2Item item; //物品
+};
+
 // CDiabloEdit2App:
 // 有关此类的实现，请参阅 Diablo Edit2.cpp
 //
@@ -139,7 +144,7 @@ public:
 	std::vector<CString> g_allItemNames;
 
 	// It requires a hash function (CStringHash) for CString
-	std::unordered_map<CString, std::vector<CD2Item>, CStringHash> g_hashMap_itemSelection_Normal,
+	std::unordered_map<CString, std::vector<ItemWithCharacterName>, CStringHash> g_hashMap_itemSelection_Normal,
 		g_hashMap_itemSelection_Magic,
 		g_hashMap_itemSelection_Rare,
 		g_hashMap_itemSelection_Set,

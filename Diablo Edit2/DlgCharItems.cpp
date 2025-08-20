@@ -543,7 +543,7 @@ char* ConvertCStringToBytes(LPCWSTR cst) {
 	return utf8Str;
 }
 
-static void InsertItemIntoHashMap(std::unordered_map<CString, std::vector<CD2Item>, CStringHash> & hashMap, const CString & itemName, const CD2Item & item) {
+static void InsertItemIntoHashMap(std::unordered_map<CString, std::vector<ItemWithCharacterName>, CStringHash> & hashMap, const CString & itemName, const ItemWithCharacterName& item) {
 	if (hashMap.find(itemName) == hashMap.end()) {
 		hashMap[itemName] = {};
 	}
@@ -575,6 +575,8 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 		int quality = item.Quality();
 		if (item.IsRuneWord()) quality += 10;
 
+		ItemWithCharacterName iwcn = { playerName, item };
+
 		CString concated = _T("");
 		//str.Format(_T("Value: %d, Pi: %.2f"), nValue, fValue);
 		concated.Format(_T("%-4d%s  %s"), quality, playerName, itemName);
@@ -582,27 +584,27 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 		::theApp.g_allItemNames.push_back(concated);
 
 		if (quality == 4) {
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Magic, itemName, item);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Magic, itemName, iwcn);
 		}
 		else if (quality == 5)
 		{
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Set, itemName, item);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Set, itemName, iwcn);
 		}
 		else if (quality == 6)
 		{
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Rare, itemName, item);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Rare, itemName, iwcn);
 		}
 		else if (quality == 7)
 		{
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Unique, itemName, item);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Unique, itemName, iwcn);
 		}
 		else if (quality == 8)
 		{
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Craft, itemName, item);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Craft, itemName, iwcn);
 		}
 		else if (quality > 8)
 		{
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_RuneWord, itemName, item);
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_RuneWord, itemName, iwcn);
 		}
 		else {
 			// Filter out known unwanted items.
@@ -610,7 +612,7 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 				concated.ReverseFind(_T('Scroll')) == -1 &&
 				concated.ReverseFind(_T('Key')) == -1
 				){
-				InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Normal, itemName, item);
+				InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Normal, itemName, iwcn);
 			}
 		}
 

@@ -25,6 +25,7 @@ void CDlgSummary::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_Unique, m_cbUniqueItemComboBox);
 	DDX_Control(pDX, IDC_COMBO_RuneWord, m_cbRuneWordItemComboBox);
 	DDX_Control(pDX, IDC_COMBO_Craft, m_cbCraftItemComboBox);
+	DDX_Control(pDX, IDC_COMBO_SelectedItem, m_cbSelectedItemComboBox);
 
 	DDX_Text(pDX, IDC_STATIC, m_s1);
 
@@ -71,7 +72,7 @@ void CDlgSummary::ResetAll()
 {
 }
 
-static void UpdateItemComboboxWithHashMap(CComboBox& ccb, std::unordered_map<CString, std::vector<CD2Item>, CStringHash> hashMap, std::vector<CString> & keys) {
+static void UpdateItemComboboxWithHashMap(CComboBox& ccb, std::unordered_map<CString, std::vector<ItemWithCharacterName>, CStringHash> hashMap, std::vector<CString> & keys) {
 	ccb.ResetContent();
 	keys.clear();  // 清空传入的键向量
 
@@ -79,8 +80,7 @@ static void UpdateItemComboboxWithHashMap(CComboBox& ccb, std::unordered_map<CSt
 	for (const auto& pair : hashMap) {
 		// 处理键值对
 		CString key = pair.first, content=_T("");
-		const std::vector<CD2Item> vec = pair.second;
-		const size_t count = vec.size();  // 获取向量的大小
+		const size_t count = pair.second.size();  // 获取向量的大小
 		content.AppendFormat(_T("%s (%d)"), key, (int)count);  // 添加计数到键后面
 		ccb.AddString(content);  // 添加键到组合框
 		keys.push_back(key);  // 将键添加到传入的向量中
@@ -93,12 +93,12 @@ static void UpdateItemComboboxWithHashMap(CComboBox& ccb, std::unordered_map<CSt
 
 void CDlgSummary::UpdateItemsCombobox()
 {
-	UpdateItemComboboxWithHashMap(m_cbMagicItemComboBox, ::theApp.g_hashMap_itemSelection_Magic, m_NormalItemKeys);
-	UpdateItemComboboxWithHashMap(m_cbRareItemComboBox, ::theApp.g_hashMap_itemSelection_Rare, m_NormalItemKeys);
-	UpdateItemComboboxWithHashMap(m_cbSetItemComboBox, ::theApp.g_hashMap_itemSelection_Set, m_NormalItemKeys);
-	UpdateItemComboboxWithHashMap(m_cbUniqueItemComboBox, ::theApp.g_hashMap_itemSelection_Unique, m_NormalItemKeys);
-	UpdateItemComboboxWithHashMap(m_cbRuneWordItemComboBox, ::theApp.g_hashMap_itemSelection_RuneWord, m_NormalItemKeys);
-	UpdateItemComboboxWithHashMap(m_cbCraftItemComboBox, ::theApp.g_hashMap_itemSelection_Craft, m_NormalItemKeys);
+	UpdateItemComboboxWithHashMap(m_cbMagicItemComboBox, ::theApp.g_hashMap_itemSelection_Magic, m_MagicItemKeys);
+	UpdateItemComboboxWithHashMap(m_cbRareItemComboBox, ::theApp.g_hashMap_itemSelection_Rare, m_RareItemKeys);
+	UpdateItemComboboxWithHashMap(m_cbSetItemComboBox, ::theApp.g_hashMap_itemSelection_Set, m_SetItemKeys);
+	UpdateItemComboboxWithHashMap(m_cbUniqueItemComboBox, ::theApp.g_hashMap_itemSelection_Unique, m_UniqueItemKeys);
+	UpdateItemComboboxWithHashMap(m_cbRuneWordItemComboBox, ::theApp.g_hashMap_itemSelection_RuneWord, m_RuneWordItemKeys);
+	UpdateItemComboboxWithHashMap(m_cbCraftItemComboBox, ::theApp.g_hashMap_itemSelection_Craft, m_CraftItemKeys);
 	UpdateItemComboboxWithHashMap(m_cbNormalItemComboBox, ::theApp.g_hashMap_itemSelection_Normal, m_NormalItemKeys);
 }
 
@@ -162,16 +162,31 @@ void CDlgSummary::RefreshUI(void)
 	//		m_dlgTabPage[i]->MoveWindow(rect);
 }
 
+void CDlgSummary::UpdateSelectedItemCombobox(std::vector<ItemWithCharacterName> & items)
+{
+	m_cbSelectedItemComboBox.ResetContent();
+	for (const auto& item : items) {
+		CString itemName = item.item.ItemName().GetString(),
+			content = _T("");
+		content.AppendFormat(_T("%s (%s)"), itemName, item.characterName.GetString());
+		m_cbSelectedItemComboBox.AddString(content);
+	}
+	if (m_cbSelectedItemComboBox.GetCount() > 0) {
+		m_cbSelectedItemComboBox.SetCurSel(0);
+	}
+}
+
 void CDlgSummary::OnCbnSelchangeComboNormal()
 {
 	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_Normal);
 	int nIndex = pCombo->GetCurSel();
-	CString key = m_NormalItemKeys[nIndex];
-	std::vector<CD2Item> items = ::theApp.g_hashMap_itemSelection_Normal[key];
+	CString key = m_NormalItemKeys[nIndex], msg=_T("");
+	std::vector<ItemWithCharacterName> items = ::theApp.g_hashMap_itemSelection_Normal[key];
 
-	CString s = _T("");
-	s.AppendFormat(_T("Selected Normal item: %d | %s | %d"), nIndex, key, items.size());
-	m_s1.SetString(s);
+	msg.AppendFormat(_T("Selected Normal item: %d | %s | %d"), nIndex, key, items.size());
+	m_s1.SetString(msg);
+
+	UpdateSelectedItemCombobox(items);
 
 	UpdateData(FALSE);
 }
@@ -180,10 +195,13 @@ void CDlgSummary::OnCbnSelchangeComboMagic()
 {
 	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_Magic);
 	int nIndex = pCombo->GetCurSel();
+	CString key = m_MagicItemKeys[nIndex], msg = _T("");
+	std::vector<ItemWithCharacterName> items = ::theApp.g_hashMap_itemSelection_Magic[key];
 
-	CString s = _T("");
-	s.AppendFormat(_T("Selected Magic item: %d"), nIndex);
-	m_s1.SetString(s);
+	msg.AppendFormat(_T("Selected Magic item: %d | %s | %d"), nIndex, key, items.size());
+	m_s1.SetString(msg);
+
+	UpdateSelectedItemCombobox(items);
 
 	UpdateData(FALSE);
 }
@@ -192,10 +210,13 @@ void CDlgSummary::OnCbnSelchangeComboRare()
 {
 	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_Rare);
 	int nIndex = pCombo->GetCurSel();
+	CString key = m_RareItemKeys[nIndex], msg = _T("");
+	std::vector<ItemWithCharacterName> items = ::theApp.g_hashMap_itemSelection_Rare[key];
 
-	CString s = _T("");
-	s.AppendFormat(_T("Selected Rare item: %d"), nIndex);
-	m_s1.SetString(s);
+	msg.AppendFormat(_T("Selected Rare item: %d | %s | %d"), nIndex, key, items.size());
+	m_s1.SetString(msg);
+
+	UpdateSelectedItemCombobox(items);
 
 	UpdateData(FALSE);
 }
@@ -204,10 +225,13 @@ void CDlgSummary::OnCbnSelchangeComboSet()
 {
 	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_Set);
 	int nIndex = pCombo->GetCurSel();
+	CString key = m_SetItemKeys[nIndex], msg = _T("");
+	std::vector<ItemWithCharacterName> items = ::theApp.g_hashMap_itemSelection_Set[key];
 
-	CString s = _T("");
-	s.AppendFormat(_T("Selected Set item: %d"), nIndex);
-	m_s1.SetString(s);
+	msg.AppendFormat(_T("Selected Set item: %d | %s | %d"), nIndex, key, items.size());
+	m_s1.SetString(msg);
+	
+	UpdateSelectedItemCombobox(items);
 
 	UpdateData(FALSE);
 }
@@ -216,10 +240,13 @@ void CDlgSummary::OnCbnSelchangeComboUnique()
 {
 	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_Unique);
 	int nIndex = pCombo->GetCurSel();
+	CString key = m_UniqueItemKeys[nIndex], msg = _T("");
+	std::vector<ItemWithCharacterName> items = ::theApp.g_hashMap_itemSelection_Unique[key];
 
-	CString s = _T("");
-	s.AppendFormat(_T("Selected Unique item: %d"), nIndex);
-	m_s1.SetString(s);
+	msg.AppendFormat(_T("Selected Unique item: %d | %s | %d"), nIndex, key, items.size());
+	m_s1.SetString(msg);
+
+	UpdateSelectedItemCombobox(items);
 
 	UpdateData(FALSE);
 }
@@ -228,10 +255,13 @@ void CDlgSummary::OnCbnSelchangeComboRuneWord()
 {
 	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_RuneWord);
 	int nIndex = pCombo->GetCurSel();
+	CString key = m_RuneWordItemKeys[nIndex], msg = _T("");
+	std::vector<ItemWithCharacterName> items = ::theApp.g_hashMap_itemSelection_RuneWord[key];
 
-	CString s = _T("");
-	s.AppendFormat(_T("Selected RuneWord item: %d"), nIndex);
-	m_s1.SetString(s);
+	msg.AppendFormat(_T("Selected RuneWord item: %d | %s | %d"), nIndex, key, items.size());
+	m_s1.SetString(msg);
+
+	UpdateSelectedItemCombobox(items);
 
 	UpdateData(FALSE);
 }
@@ -240,10 +270,13 @@ void CDlgSummary::OnCbnSelchangeComboCraft()
 {
 	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_Craft);
 	int nIndex = pCombo->GetCurSel();
+	CString key = m_CraftItemKeys[nIndex], msg = _T("");
+	std::vector<ItemWithCharacterName> items = ::theApp.g_hashMap_itemSelection_Craft[key];
 
-	CString s = _T("");
-	s.AppendFormat(_T("Selected Craft item: %d"), nIndex);
-	m_s1.SetString(s);
+	msg.AppendFormat(_T("Selected Craft item: %d | %s | %d"), nIndex, key, items.size());
+	m_s1.SetString(msg);
+
+	UpdateSelectedItemCombobox(items);
 
 	UpdateData(FALSE);
 }
