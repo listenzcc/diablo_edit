@@ -943,7 +943,7 @@ tuple<int, int, int> CDlgCharItems::HitTestPosition(CPoint pos, int col, int row
 void CDlgCharItems::ShowItemInfoDlg(const CD2Item * pItem, int x, int gems){
     if(!m_bNotShowItemInfoDlg && pItem && (!m_pDlgItemInfo || pItem != m_pDlgItemInfo->GetItemPtr())){
         if(!m_pDlgItemInfo){
-			m_pDlgItemInfo = make_unique<CDlgSuspend>(this, m_scTrasparent.GetPos());
+			m_pDlgItemInfo = std::make_unique<CDlgSuspend>(this, m_scTrasparent.GetPos());
             m_pDlgItemInfo->Create(CDlgSuspend::IDD,NULL);
         }
         m_pDlgItemInfo->GetItemInfo(pItem, gems);
@@ -958,8 +958,11 @@ void CDlgCharItems::ShowItemInfoDlg(const CD2Item * pItem, int x, int gems){
 		m_pDlgItemInfo->MoveWindow(rect1.left, rect1.top, rect.Width(), rect.Height(), TRUE);
         m_pDlgItemInfo->ShowWindow(SW_SHOWNOACTIVATE); //显示对话框
         m_pDlgItemInfo->Invalidate();
-    }else if(!pItem && m_pDlgItemInfo)
-        m_pDlgItemInfo.reset();
+	}
+	else if (!pItem && m_pDlgItemInfo)
+	{
+		m_pDlgItemInfo.reset();
+	}
 }
 
 void CDlgCharItems::ResetAll()

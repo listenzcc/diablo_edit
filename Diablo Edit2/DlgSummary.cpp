@@ -4,6 +4,7 @@
 #include "Diablo Edit2View.h"
 
 
+
 IMPLEMENT_DYNAMIC(CDlgSummary, CCharacterDialogBase)
 
 CDlgSummary::CDlgSummary(CWnd* pParent /*=nullptr*/)
@@ -26,6 +27,7 @@ void CDlgSummary::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_RuneWord, m_cbRuneWordItemComboBox);
 	DDX_Control(pDX, IDC_COMBO_Craft, m_cbCraftItemComboBox);
 	DDX_Control(pDX, IDC_COMBO_SelectedItem, m_cbSelectedItemComboBox);
+	DDX_Control(pDX, IDC_INV_CUBE2, m_stInfo);  // 绑定 Group-box
 
 	DDX_Text(pDX, IDC_STATIC, m_s1);
 
@@ -40,6 +42,7 @@ BEGIN_MESSAGE_MAP(CDlgSummary, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO_Unique, &CDlgSummary::OnCbnSelchangeComboUnique)
 	ON_CBN_SELCHANGE(IDC_COMBO_RuneWord, &CDlgSummary::OnCbnSelchangeComboRuneWord)
 	ON_CBN_SELCHANGE(IDC_COMBO_Craft, &CDlgSummary::OnCbnSelchangeComboCraft)
+	ON_CBN_SELCHANGE(IDC_COMBO_SelectedItem, &CDlgSummary::OnCbnSelchangeComboSelectedItem)
 END_MESSAGE_MAP()
 
 //BOOL CDlgSummary::OnInitDialog()
@@ -143,37 +146,50 @@ void CDlgSummary::InitUI(void) {
 
 void CDlgSummary::RefreshUI(void)
 {
-	//// In case of resize, the tab control needs to resize
-	//CRect rect;
-	//GetClientRect(&rect);
-
-	//CRect rectTab;
-	//m_tcBasicInfo.GetWindowRect(&rectTab);
-	//ScreenToClient(&rectTab);
-	//rect.top = rectTab.top;
-
-	//m_tcBasicInfo.MoveWindow(rect);
-	//m_tcBasicInfo.GetClientRect(&rect);
-	//m_tcBasicInfo.AdjustRect(FALSE, &rect);
-
-	//// resize views
-	//if (m_dlgTabPage)
-	//	for (int i = 0; i < m_nTabPageCount; ++i)
-	//		m_dlgTabPage[i]->MoveWindow(rect);
 }
 
-void CDlgSummary::UpdateSelectedItemCombobox(std::vector<ItemWithCharacterName> & items)
+void CDlgSummary::UpdateSelectedItemCombobox(std::vector<ItemWithCharacterName> & iwcns)
 {
 	m_cbSelectedItemComboBox.ResetContent();
-	for (const auto& item : items) {
-		CString itemName = item.item.ItemName().GetString(),
+	m_selectedItemVector.clear(); // Clear the vector to store new items
+	for (const auto& iwcn : iwcns) {
+		CString itemName = iwcn.item.ItemName().GetString(),
 			content = _T("");
-		content.AppendFormat(_T("%s (%s)"), itemName, item.characterName.GetString());
+		content.AppendFormat(_T("%s (%s)"), itemName, iwcn.characterName.GetString());
 		m_cbSelectedItemComboBox.AddString(content);
+		m_selectedItemVector.push_back(iwcn.item); // Store the item in the vector for later use
 	}
 	if (m_cbSelectedItemComboBox.GetCount() > 0) {
 		m_cbSelectedItemComboBox.SetCurSel(0);
 	}
+
+	//const CD2Item* item = 0;
+	//auto iwcn = iwcns[0];
+	//item = &iwcn.item;
+	//int x = 77, gems = 0; // Default values for x and gems
+
+	if (m_pDlgItemInfo) m_pDlgItemInfo.reset();
+
+	//ShowItemInfoDlg(item, x, 0); // Show item info dialog with the first item in the list
+
+	OnCbnSelchangeComboSelectedItem(); // Trigger the selection change to update the display
+
+	UpdateData(FALSE);
+}
+
+void CDlgSummary::OnCbnSelchangeComboSelectedItem()
+{
+	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_SelectedItem);
+	int nIndex = pCombo->GetCurSel();
+	if (nIndex < 0 || nIndex >= m_selectedItemVector.size()) return;
+	const CD2Item* pItem = &m_selectedItemVector[nIndex];
+	CString msg = _T("");
+	msg.AppendFormat(_T("Selected item: %d | %s"), nIndex, pItem->ItemName().GetString());
+	m_s1.SetString(msg);
+	
+	if (m_pDlgItemInfo) m_pDlgItemInfo.reset();
+	ShowItemInfoDlg(pItem, 77, 0); // Show item info dialog with the selected item
+	UpdateData(FALSE);
 }
 
 void CDlgSummary::OnCbnSelchangeComboNormal()
@@ -279,4 +295,29 @@ void CDlgSummary::OnCbnSelchangeComboCraft()
 	UpdateSelectedItemCombobox(items);
 
 	UpdateData(FALSE);
+}
+
+void CDlgSummary::ShowItemInfoDlg(const CD2Item* pItem, int x, int gems) {
+	m_bNotShowItemInfoDlg = FALSE; // This should be set based on user preference or application state
+	m_scTrasparent.SetRange(0, 255);
+	m_scTrasparent.SetPos(200); // Set default transparency, can be adjusted based on user preference
+
+	if (!m_bNotShowItemInfoDlg && pItem && (!m_pDlgItemInfo || pItem != m_pDlgItemInfo->GetItemPtr())) {
+		if (!m_pDlgItemInfo) {
+			m_pDlgItemInfo = std::make_unique<CDlgSuspend>(this, 200);
+			m_pDlgItemInfo->Create(CDlgSuspend::IDD, NULL);
+		}
+		m_pDlgItemInfo->GetItemInfo(pItem, gems);
+		CRect rect, rect1, rect2;
+		m_pDlgItemInfo->GetWindowRect(&rect);
+		GetWindowRect(&rect1);
+		m_stInfo.GetWindowRect(&rect2);
+
+		m_pDlgItemInfo->MoveWindow(rect2.left, rect2.top, rect.Width(), rect.Height(), TRUE);
+		m_pDlgItemInfo->ShowWindow(SW_SHOWNOACTIVATE); //显示对话框
+		m_pDlgItemInfo->Invalidate();
+	}
+	else if (!pItem && m_pDlgItemInfo) {
+		m_pDlgItemInfo.reset();
+	}
 }
