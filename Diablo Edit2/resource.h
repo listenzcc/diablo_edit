@@ -393,6 +393,7 @@
 #define IDC_COMBO_RuneWord              1011
 #define IDC_CHECK7                      1012
 #define IDC_COMBO_PARAM1                1012
+#define IDC_COMBO_SelectedItem          1012
 #define IDC_CHECK8                      1013
 #define IDC_CHECK_INDESTRUCTIBLE        1013
 #define IDC_CHECK9                      1014
@@ -492,6 +493,7 @@
 #define IDC_INV_CORPSD_LH               1070
 #define IDC_STATIC_RuneWord             1070
 #define IDC_INV_MERC_RH                 1071
+#define IDC_INV_CUBE2                   1071
 #define IDC_INV_MERC_LH                 1072
 #define IDC_LIST1                       1073
 #define IDC_INV_GOLEM                   1074
