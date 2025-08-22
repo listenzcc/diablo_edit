@@ -496,6 +496,7 @@
 #define IDC_INV_CUBE2                   1071
 #define IDC_INV_MERC_LH                 1072
 #define IDC_LIST1                       1073
+#define IDC_TREE2                       1073
 #define IDC_INV_GOLEM                   1074
 #define IDC_INV_TORSO                   1075
 #define IDC_INV_CORPSE_TORSO            1076
@@ -639,7 +640,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        481
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1066
+#define _APS_NEXT_CONTROL_VALUE         1074
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif
