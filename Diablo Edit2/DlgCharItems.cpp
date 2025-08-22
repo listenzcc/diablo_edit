@@ -550,6 +550,68 @@ static void InsertItemIntoHashMap(std::unordered_map<CString, std::vector<ItemWi
 	hashMap[itemName].push_back(item);
 }
 
+void CDlgCharItems::TakeInTheItem(std::ofstream & outFile, CD2Item item, CD2S_Struct character) {
+	ATL::CSimpleStringT<wchar_t, 1> playerName = character.name();
+	ATL::CSimpleStringT<wchar_t, 1> itemName = item.ItemName();
+
+	int quality = item.Quality();
+	if (item.IsRuneWord()) quality += 10;
+
+	ItemWithCharacterName iwcn = { playerName, item };
+
+	CString concated = _T("");
+	//str.Format(_T("Value: %d, Pi: %.2f"), nValue, fValue);
+	concated.Format(_T("%-4d%s  %s"), quality, playerName, itemName);
+
+	::theApp.g_allItemNames.push_back(concated);
+
+	if (quality == 4) {
+		InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Magic, itemName, iwcn);
+	}
+	else if (quality == 5)
+	{
+		InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Set, itemName, iwcn);
+	}
+	else if (quality == 6)
+	{
+		InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Rare, itemName, iwcn);
+	}
+	else if (quality == 7)
+	{
+		InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Unique, itemName, iwcn);
+	}
+	else if (quality == 8)
+	{
+		InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Craft, itemName, iwcn);
+	}
+	else if (quality > 8)
+	{
+		InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_RuneWord, itemName, iwcn);
+	}
+	else {
+		// Filter out known unwanted items.
+		if (concated.ReverseFind(_T('Potion')) == -1 &&
+			concated.ReverseFind(_T('Scroll')) == -1 &&
+			concated.ReverseFind(_T('Key')) == -1
+			) {
+			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Normal, itemName, iwcn);
+		}
+	}
+
+	char* utf8PlayerName = ConvertCStringToBytes(playerName.GetString());
+	char* utf8ItemName = ConvertCStringToBytes(itemName.GetString()); // new char[utf8ItemNameLen];
+
+	// Write the item and player names in UTF-8 to the file
+	outFile << "Player Name: " << utf8PlayerName << "\n";
+	outFile << "Item Name: " << utf8ItemName << "\n";
+	outFile << "Quality: " << quality << "\n";
+	outFile << "------------------------------\n";
+
+	// Free the dynamically allocated memory
+	delete[] utf8ItemName;
+	delete[] utf8PlayerName;
+}
+
 void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 	ResetAll();
 	m_bHasCharacter = TRUE;
@@ -569,78 +631,9 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 	for (auto & item : character.ItemList.vItems) {
 		AddItemInGrid(item, 0);
 
-		ATL::CSimpleStringT<wchar_t, 1> playerName = character.name();
-		ATL::CSimpleStringT<wchar_t, 1> itemName = item.ItemName();
-
-		int quality = item.Quality();
-		if (item.IsRuneWord()) quality += 10;
-
-		ItemWithCharacterName iwcn = { playerName, item };
-
-		CString concated = _T("");
-		//str.Format(_T("Value: %d, Pi: %.2f"), nValue, fValue);
-		concated.Format(_T("%-4d%s  %s"), quality, playerName, itemName);
-
-		::theApp.g_allItemNames.push_back(concated);
-
-		if (quality == 4) {
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Magic, itemName, iwcn);
-		}
-		else if (quality == 5)
-		{
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Set, itemName, iwcn);
-		}
-		else if (quality == 6)
-		{
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Rare, itemName, iwcn);
-		}
-		else if (quality == 7)
-		{
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Unique, itemName, iwcn);
-		}
-		else if (quality == 8)
-		{
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Craft, itemName, iwcn);
-		}
-		else if (quality > 8)
-		{
-			InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_RuneWord, itemName, iwcn);
-		}
-		else {
-			// Filter out known unwanted items.
-			if (concated.ReverseFind(_T('Potion')) == -1 &&
-				concated.ReverseFind(_T('Scroll')) == -1 &&
-				concated.ReverseFind(_T('Key')) == -1
-				){
-				InsertItemIntoHashMap(::theApp.g_hashMap_itemSelection_Normal, itemName, iwcn);
-			}
-		}
-
-		char* utf8PlayerName = ConvertCStringToBytes(playerName.GetString());
-		char* utf8ItemName = ConvertCStringToBytes(itemName.GetString()); // new char[utf8ItemNameLen];
-
-		// Write the item and player names in UTF-8 to the file
-		outFile << "Player Name: " << utf8PlayerName << "\n";
-		outFile << "Item Name: " << utf8ItemName << "\n";
-		outFile << "Quality: " << quality << "\n";
-		outFile << "------------------------------\n";
-
-		// Free the dynamically allocated memory
-		delete[] utf8ItemName;
-		delete[] utf8PlayerName;
-
-		/*
-		// Write the item and player names to the file directly as wide characters
-		outFile << L"Item Name: " << itemName.GetString() << L"\n";
-		// outFile << L"Player Name: " << playerName.GetString() << L"\n";
-		outFile << L"Player Name: "<< playerName << L"\n";
-		outFile << L"------------------------------\n";
-		*/
-
+		TakeInTheItem(outFile, item, character);
 	}
 
-	// Close the file after writing
-	outFile.close();
 
 	//Corpse items
 	if (character.HasCorpse()) {
@@ -662,11 +655,20 @@ void CDlgCharItems::UpdateUI(const CD2S_Struct & character) {
 		m_chMercDead.SetCheck(character.bMercDead);
 		ASSERT(character.stMercenary.stItems.exist());
 		for (auto & item : character.stMercenary.stItems->vItems)
+		{
 			AddItemInGrid(item, 2);
+
+			TakeInTheItem(outFile, item, character);
+		}
 	}
 	//Golem
 	if (character.stGolem.pItem.exist())
 		AddItemInGrid(*character.stGolem.pItem, 3);
+
+
+	// Close the file after writing
+	outFile.close();
+
 	UpdateData(FALSE);
 	Invalidate();
 }

@@ -139,6 +139,7 @@ private:
 	void DrawItemXY(CPaintDC & dc, CPoint pos, const CItemView & itemView) const;	//在绝对坐标点画物品
 	void DrawAllItemsInGrid(CPaintDC & dc) const;		//画网格内的所有物品，如果选中的物品镶嵌了物品，也要画出来
 	void SetD2R(BOOL v);
+	void CDlgCharItems::TakeInTheItem(std::ofstream &, CD2Item item, CD2S_Struct character);
 
 	DECLARE_MESSAGE_MAP()
 public:
