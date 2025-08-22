@@ -66,6 +66,9 @@ private:
 
 	std::vector<CD2Item> m_selectedItemVector;
 
+	CEdit m_edItemDetails; // Edit control to display item details
+	CTreeCtrl m_treeItems; // Tree control to display items in a hierarchical manner
+
 	CString m_s1;
 
 // 自定义函数
@@ -91,4 +94,5 @@ public:
 	afx_msg void OnCbnSelchangeComboRuneWord();
 	afx_msg void OnCbnSelchangeComboCraft();
 	afx_msg void OnCbnSelchangeComboSelectedItem();
+	afx_msg void OnTvnSelchangedTreeItems(NMHDR* pNMHDR, LRESULT* pResult);
 };

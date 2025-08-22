@@ -241,8 +241,12 @@ BOOL CDlgSuspend::OnInitDialog()
 void CDlgSuspend::OnMouseMove(UINT nFlags, CPoint point)
 {
 	CRect rect(202,17,262,137);
-	if(!rect.PtInRect(point))
+
+	if (m_bAllowMouseHoverHide && !rect.PtInRect(point))
+	{
 		ShowWindow(SW_HIDE);
+	}
+
 	CDialog::OnMouseMove(nFlags, point);
 }
 

@@ -22,13 +22,14 @@ private:
 	static const LONG WINDOW_WIDTH_MIN = 273;	//窗口最小宽度
 	UINT m_nTransparency;       //窗体透明度
 	const CD2Item * m_pItem;
-	std::vector<__MsgType> m_sItemMsg;	//物品的信息
 //自定义函数
 	void AddMsg(BYTE color, const CString & msg);
 	void AddPropertyList(BYTE color, DWORD version, const CPropertyList & propList);
 public:
+	std::vector<__MsgType> m_sItemMsg;	//物品的信息
 	LONG GetItemInfo(const CD2Item * pItem, int iGems);		//读取物品属性并显示，返回窗体的高度。iGems为镶嵌宝石数量
 	const CD2Item * GetItemPtr() const{return m_pItem;}
+	BOOL m_bAllowMouseHoverHide = TRUE; //是否允许鼠标悬停时隐藏窗口
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 

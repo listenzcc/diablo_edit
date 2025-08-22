@@ -2,6 +2,7 @@
 #include "DlgSummary.h"
 #include "Diablo Edit2.h"
 #include "Diablo Edit2View.h"
+#include <numeric> // 包含 accumulate
 
 
 
@@ -29,6 +30,8 @@ void CDlgSummary::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_Craft, m_cbCraftItemComboBox);
 	DDX_Control(pDX, IDC_COMBO_SelectedItem, m_cbSelectedItemComboBox);
 	DDX_Control(pDX, IDC_INV_CUBE2, m_stInfo);  // 绑定 Group-box
+	DDX_Control(pDX, IDC_EDIT1, m_edItemDetails);
+	DDX_Control(pDX, IDC_TREE2, m_treeItems);
 
 	DDX_Text(pDX, IDC_STATIC, m_s1);
 
@@ -44,6 +47,7 @@ BEGIN_MESSAGE_MAP(CDlgSummary, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO_RuneWord, &CDlgSummary::OnCbnSelchangeComboRuneWord)
 	ON_CBN_SELCHANGE(IDC_COMBO_Craft, &CDlgSummary::OnCbnSelchangeComboCraft)
 	ON_CBN_SELCHANGE(IDC_COMBO_SelectedItem, &CDlgSummary::OnCbnSelchangeComboSelectedItem)
+	ON_NOTIFY(TVN_SELCHANGED, IDC_TREE2, &CDlgSummary::OnTvnSelchangedTreeItems)
 END_MESSAGE_MAP()
 
 //BOOL CDlgSummary::OnInitDialog()
@@ -57,6 +61,80 @@ CDlgSummary::~CDlgSummary()
 {
 }
 
+// 选择改变事件
+void CDlgSummary::OnTvnSelchangedTreeItems(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+
+	HTREEITEM hSelected = m_treeItems.GetSelectedItem();
+	if (hSelected)
+	{
+		CString strFullPath;
+		HTREEITEM hCurrent = hSelected;
+		std::vector<CString> pathParts;
+
+		// 构建路径
+		while (hCurrent != NULL)
+		{
+			CString strName = m_treeItems.GetItemText(hCurrent);
+			pathParts.push_back(strName);
+			hCurrent = m_treeItems.GetParentItem(hCurrent);
+		}
+
+		CString joinedPath = std::accumulate(
+			std::next(pathParts.begin()),
+			pathParts.end(),
+			pathParts[0],
+			[](const CString& a, const CString& b) {
+				return a + _T(" < ") + b;
+			}
+		);
+
+		int lvl = pathParts.size();
+		joinedPath.AppendFormat(_T(" (level: %d)"), lvl);
+
+		if (lvl == 3) {
+			//MessageBox(joinedPath, _T("选中的节点路径"));
+
+			CString key = pathParts[0];
+			std::vector<ItemWithCharacterName> iwcns;
+
+			if (pathParts[1] == _T("Normal")) {
+				// 处理普通物品
+				iwcns = ::theApp.g_hashMap_itemSelection_Normal[key];
+			}
+			else if (pathParts[1] == _T("Magic")) {
+				// 处理魔法物品
+				iwcns = ::theApp.g_hashMap_itemSelection_Magic[key];
+			}
+			else if (pathParts[1] == _T("Rare")) {
+				// 处理稀有物品
+				iwcns = ::theApp.g_hashMap_itemSelection_Rare[key];
+			}
+			else if (pathParts[1] == _T("Set")) {
+				// 处理套装物品
+				iwcns = ::theApp.g_hashMap_itemSelection_Set[key];
+			}
+			else if (pathParts[1] == _T("Unique")) {
+				// 处理独特物品
+				iwcns = ::theApp.g_hashMap_itemSelection_Unique[key];
+			}
+			else if (pathParts[1] == _T("RuneWord")) {
+				// 处理符文之语
+				iwcns = ::theApp.g_hashMap_itemSelection_RuneWord[key];
+			}
+			else if (pathParts[1] == _T("Craft")) {
+				// 处理制作物品
+				iwcns = ::theApp.g_hashMap_itemSelection_Craft[key];
+			}
+			UpdateSelectedItemCombobox(iwcns);
+
+		}
+	}
+
+	*pResult = 0;
+}
+
 void CDlgSummary::UpdateUI(const CD2S_Struct& character)
 {
 	// Only update after data is fully loaded
@@ -64,6 +142,57 @@ void CDlgSummary::UpdateUI(const CD2S_Struct& character)
 	if (::theApp.dataIsFullyLoaded) {
 		LoadText();
 		UpdateItemsCombobox();
+
+		m_treeItems.DeleteAllItems(); // Clear the tree control before updating
+		// 添加根节点
+
+		HTREEITEM hRoot = m_treeItems.InsertItem(_T("Items"), 0, 1, TVI_ROOT),
+			hNorm = m_treeItems.InsertItem(_T("Normal"), 0, 1, hRoot),
+			hMagic = m_treeItems.InsertItem(_T("Magic"), 0, 1, hRoot),
+			hRare = m_treeItems.InsertItem(_T("Rare"), 0, 1, hRoot),
+			hUnique = m_treeItems.InsertItem(_T("Unique"), 0, 1, hRoot),
+			hSet = m_treeItems.InsertItem(_T("Set"), 0, 1, hRoot),
+			hRuneWord = m_treeItems.InsertItem(_T("RuneWord"), 0, 1, hRoot),
+			hCraft = m_treeItems.InsertItem(_T("Craft"), 0, 1, hRoot);
+
+		// 添加子节点
+		for (auto& name : m_NormalItemKeys) {
+			// 在普通物品下添加子节点
+			m_treeItems.InsertItem(name, 2, 3, hNorm);
+		}
+
+		for (auto& name : m_MagicItemKeys) {
+			// 在魔法物品下添加子节点
+			m_treeItems.InsertItem(name, 2, 3, hMagic);
+		}
+
+		for (auto& name : m_RareItemKeys) {
+			// 在稀有物品下添加子节点
+			m_treeItems.InsertItem(name, 2, 3, hRare);
+		}
+
+		for (auto& name : m_UniqueItemKeys) {
+			// 在独特物品下添加子节点
+			m_treeItems.InsertItem(name, 2, 3, hUnique);
+		}
+
+		for (auto& name : m_SetItemKeys) {
+			// 在套装物品下添加子节点
+			m_treeItems.InsertItem(name, 2, 3, hSet);
+		}
+
+		for (auto& name : m_RuneWordItemKeys) {
+			// 在符文之语下添加子节点
+			m_treeItems.InsertItem(name, 2, 3, hRuneWord);
+		}
+
+		for (auto& name : m_CraftItemKeys) {
+			// 在制作物品下添加子节点
+			m_treeItems.InsertItem(name, 2, 3, hCraft);
+		}
+
+		// 展开根节点
+		m_treeItems.Expand(hRoot, TVE_EXPAND);
 	}
 }
 
@@ -318,8 +447,17 @@ void CDlgSummary::ShowItemInfoDlg(const CD2Item* pItem, int x, int gems) {
 		if (!m_pDlgItemInfo) {
 			m_pDlgItemInfo = std::make_unique<CDlgSuspend>(this, 200);
 			m_pDlgItemInfo->Create(CDlgSuspend::IDD, NULL);
+			m_pDlgItemInfo->m_bAllowMouseHoverHide = FALSE; // Disable auto-hide on mouse hover
 		}
 		m_pDlgItemInfo->GetItemInfo(pItem, gems);
+
+		CString details = _T("");
+		for (std::pair<BYTE, CString> & pair : m_pDlgItemInfo->m_sItemMsg) {
+			details.AppendFormat(_T("%s\r\n"), pair.second);
+		}
+
+		m_edItemDetails.SetWindowText(details); // Display item details in the edit control
+
 		CRect rect, rect1, rect2;
 		m_pDlgItemInfo->GetWindowRect(&rect);
 		GetWindowRect(&rect1);
@@ -332,4 +470,5 @@ void CDlgSummary::ShowItemInfoDlg(const CD2Item* pItem, int x, int gems) {
 	else if (!pItem && m_pDlgItemInfo) {
 		m_pDlgItemInfo.reset();
 	}
+
 }
