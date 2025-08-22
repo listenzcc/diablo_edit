@@ -5,6 +5,7 @@
 
 
 
+
 IMPLEMENT_DYNAMIC(CDlgSummary, CCharacterDialogBase)
 
 CDlgSummary::CDlgSummary(CWnd* pParent /*=nullptr*/)
@@ -79,14 +80,25 @@ static void UpdateItemComboboxWithHashMap(CComboBox& ccb, std::unordered_map<CSt
 	ccb.ResetContent();
 	keys.clear();  // 清空传入的键向量
 
-	// 遍历哈希表
+	std::vector<CString> sortedKeys;
 	for (const auto& pair : hashMap) {
-		// 处理键值对
-		CString key = pair.first, content=_T("");
-		const size_t count = pair.second.size();  // 获取向量的大小
-		content.AppendFormat(_T("%s (%d)"), key, (int)count);  // 添加计数到键后面
-		ccb.AddString(content);  // 添加键到组合框
-		keys.push_back(key);  // 将键添加到传入的向量中
+		sortedKeys.push_back(pair.first);
+	}
+	std::qsort(&sortedKeys[0], sortedKeys.size(), sizeof(CString),
+		[](const void* a, const void* b) -> int {
+			return ((CString*)a)->Compare(*(CString*)b);
+		});
+
+	for (const auto& key : sortedKeys) {
+		const auto& pair = hashMap.find(key);
+		if (pair != hashMap.end()) {
+			// 处理键值对
+			CString content = _T("");
+			const size_t count = pair->second.size();  // 获取向量的大小
+			content.AppendFormat(_T("%s (%d)"), key, (int)count);  // 添加计数到键后面
+			ccb.AddString(content);  // 添加键到组合框
+			keys.push_back(key);  // 将键添加到传入的向量中
+		}
 	}
 
 	if (ccb.GetCount() > 0) {
